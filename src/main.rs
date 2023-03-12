@@ -129,21 +129,35 @@ struct CPairChunk<'a> {
 impl CPairChunk<'_> {
     fn parse_sprite(&self) -> [u8; 256] {
         let mut pixels = [0; 256];
-        for i in 0..32 {
-            let bp0 = self.odd[i * 2];
-            let bp1 = self.odd[i * 2 + 1];
-            let bp2 = self.even[i * 2];
-            let bp3 = self.even[i * 2 + 1];
+	for tile in 0..4 {
+	    let (x_offset, y_offset) = match tile {
+		0 => (8, 0),
+		1 => (8, 8),
+		2 => (0, 0),
+		3 => (0, 8),
+		_ => panic!("extra tile?"),
+	    };
 
-            for bit in 0..8 {
-                let mut index = 0;
-                index |= (bp0 >> bit) & 1;
-                index |= ((bp1 >> bit) & 1) << 1;
-                index |= ((bp2 >> bit) & 1) << 2;
-                index |= ((bp3 >> bit) & 1) << 3;
-                pixels[i * 8 + bit] = index
-            }
-        }
+	    for row in 0..8 {
+		let i = tile * 16 + row * 2;
+		let bp0 = self.odd[i];
+		let bp1 = self.odd[i + 1];
+		let bp2 = self.even[i];
+		let bp3 = self.even[i + 1];
+
+		for bit in 0..8 {
+		    let mut palette_index = 0;
+		    palette_index |= (bp0 >> bit) & 1;
+		    palette_index |= ((bp1 >> bit) & 1) << 1;
+		    palette_index |= ((bp2 >> bit) & 1) << 2;
+		    palette_index |= ((bp3 >> bit) & 1) << 3;
+
+		    let x = bit + x_offset;
+		    let y = row + y_offset;
+		    pixels[y * 16 + x] = palette_index;
+		}
+	    }
+	}
 	pixels
     }
 }
