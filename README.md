@@ -2,6 +2,13 @@
 
 Extracts sprites from Neogeo ROMs (in cartridge format).
 
+## Usage
+
+```shell
+cargo install .
+extract-sprites <path to .zip file>
+```
+
 ## License
 
 MIT Open Source License, see [LICENSE](./LICENSE).
